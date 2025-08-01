@@ -1,3 +1,3 @@
-#include "camera.h"
+#include "icamera.h"
 
 ICamera::ICamera() {}

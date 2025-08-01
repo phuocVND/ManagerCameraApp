@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
         &app,
         []() { QCoreApplication::exit(-1); },
         Qt::QueuedConnection);
-    engine.loadFromModule("ViewCamera", "Main");
+    engine.loadFromModule("CameraApp", "Main");
 
     return app.exec();
 }
