@@ -1,8 +1,8 @@
 import QtQuick
 
 Window {
-    width: 640
-    height: 480
+    width: 1920
+    height: 1080
     visible: true
-    title: qsTr("Hello World")
+    title: qsTr("Manager Camera")
 }
