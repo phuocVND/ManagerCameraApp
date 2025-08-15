@@ -5,7 +5,8 @@ project(CameraApp VERSION 0.1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(Qt6 REQUIRED COMPONENTS Quick)
-
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(appCameraApp
@@ -21,7 +22,7 @@ qt_add_qml_module(appCameraApp
         SOURCES tcpcamera.h tcpcamera.cpp
         SOURCES udpcamera.h udpcamera.cpp
         SOURCES tcpsocket.h tcpsocket.cpp
-        SOURCES updsocket.h updsocket.cpp
+        SOURCES udpsocket.h udpsocket.cpp
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
@@ -36,7 +37,7 @@ set_target_properties(appCameraApp PROPERTIES
 )
 
 target_link_libraries(appCameraApp
-    PRIVATE Qt6::Quick
+    PRIVATE Qt6::Quick ${OpenCV_LIBS}
 )
 
 include(GNUInstallDirs)

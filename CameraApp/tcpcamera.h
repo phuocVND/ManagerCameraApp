@@ -1,10 +1,17 @@
 #ifndef TCPCAMERA_H
 #define TCPCAMERA_H
-
-class TCPCamera
+#include "icamera.h"
+class TCPCamera : ICamera
 {
+private:
+    bool isEnable;
 public:
-    TCPCamera();
+    TCPCamera(){
+
+    };
+    ~TCPCamera(){
+
+    };
 };
 
 #endif // TCPCAMERA_H
