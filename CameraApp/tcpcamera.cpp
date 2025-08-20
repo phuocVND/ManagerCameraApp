@@ -1,3 +1,3 @@
 #include "tcpcamera.h"
 
-TCPCamera::TCPCamera() {}
+// TCPCamera::TCPCamera() {}

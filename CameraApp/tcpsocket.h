@@ -17,6 +17,9 @@ class TCPSocket
 
     public:
         TCPSocket(): sock(-1), port(0), ip("0.0.0.0"), initialized(false){};
+        TCPSocket(const std::string &serverIp, int serverPort)
+            : sock(-1), ip(serverIp), port(serverPort), initialized(true)
+        {}
         void init(const std::string &serverIp, int serverPort) {
             ip = serverIp;
             port = serverPort;

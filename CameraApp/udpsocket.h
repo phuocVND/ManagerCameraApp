@@ -6,9 +6,10 @@
 #include <netinet/in.h>
 #include <string>
 #include <unistd.h>
+#define MAX_UDP_SIZE 1400
 using namespace std;
-class UDPSocket
-{
+
+class UDPSocket {
 private:
     int sock;
     std::string ip;
@@ -17,18 +18,17 @@ private:
     sockaddr_in serverAddr;
 public:
     UDPSocket() : sock(-1), port(0), ip("0.0.0.0"), initialized(false) {}
-    void init(const std::string &serverIp, int serverPort) {
-        ip = serverIp;
-        port = serverPort;
-        initialized = true;
-
+    UDPSocket(const std::string &serverIp, int serverPort)
+        : sock(-1), ip(serverIp), port(serverPort), initialized(false){init();}
+    void init() {
         serverAddr.sin_family = AF_INET;
         serverAddr.sin_port = htons(port);
         if (inet_pton(AF_INET, ip.c_str(), &serverAddr.sin_addr) <= 0) {
             perror("inet_pton");
         }
+        initialized = true;
     }
-    bool open() {
+    bool connect() {
         if (!initialized) {
             cerr << "Chưa init!\n";
             return false;
@@ -52,33 +52,47 @@ public:
         }
     }
 
-    bool sendData(const char* data, ssize_t length) {
+    bool sendData(const void* data, ssize_t length) {
         if (sock == -1) return false;
-        ssize_t n = sendto(sock, data, length, 0,
-                           (struct sockaddr*)&serverAddr, sizeof(serverAddr));
-        return n >= 0;
+        const char* ptr = (const char*)data;
+        size_t sent = 0;
+
+        while (sent < length) {
+            size_t chunk = std::min((size_t)MAX_UDP_SIZE, (size_t)length - sent);
+            ssize_t n = sendto(sock, ptr + sent, chunk, 0,
+                               (struct sockaddr*)&serverAddr, sizeof(serverAddr));
+            if (n <= 0) return false; // lỗi khi gửi
+            sent += n;
+        }
+
+        return true;
     }
 
-    bool receiveData(char* buffer, size_t length) {
+    bool receiveData(void* buffer, size_t length) {
         if (sock == -1) return false;
         socklen_t addrLen = sizeof(serverAddr);
-        ssize_t n = recvfrom(sock, buffer, length, 0,
-                             (struct sockaddr*)&serverAddr, &addrLen);
-        if (n >= 0) {
-            buffer[n] = '\0';
-            return true;
+        size_t received = 0;
+
+        while (received < length) {
+            size_t chunk = std::min((size_t)MAX_UDP_SIZE, length - received);
+            ssize_t n = recvfrom(sock, (char*)buffer + received, chunk, 0,
+                                 (struct sockaddr*)&serverAddr, &addrLen);
+            if (n <= 0) return false;
+            received += n;
         }
-        return false;
+
+        return true;
     }
 
-    bool sendValue(int32_t value) {
+
+    bool sendValue(int32_t &value) {
         int32_t data = htonl(value);
-        return sendData((char*)&data, sizeof(data));
+        return sendData(&data, sizeof(int32_t));
     }
 
     bool receiveValue(int32_t &value) {
         int32_t data;
-        if (!receiveData((char*)&data, sizeof(data))) return false;
+        if (!receiveData(&data, sizeof(int32_t))) return false;
         value = ntohl(data);
         return true;
     }

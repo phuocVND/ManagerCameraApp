@@ -11,6 +11,7 @@ public:
     virtual void open() = 0;
     virtual void close() = 0;
     virtual void capture() = 0;
+    virtual void show() = 0;
     virtual cv::Mat getLatestFrame() const= 0;
     virtual void setName(const string name) = 0;
     virtual string getName() const = 0;
